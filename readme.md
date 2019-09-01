@@ -15,5 +15,7 @@ References are to "Programming" by Bjarne Stroustrup, 2nd edition, Addison Wesle
 See page 601, page 630, 677, 691, ...
 Thanks to Zac Staples whose version of a vector got me going on this.
 
+## update 1 September 2019
+Functions "insert()" and "erase()" added. These allow inserting and erasing at specified places in the vector. There are examples for int and String in the testing file. 
 
 
