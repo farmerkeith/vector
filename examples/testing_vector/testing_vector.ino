@@ -1,7 +1,7 @@
 // file testing_vector.ino
 // file created 31 August 2019 by farmerkeith
-
-#include <Vector_farmerkeith.h> // tab file
+// last update 1 September 2019
+#include "Vector_farmerkeith.h" // tab file
 
 template<typename T>
 void dualVectorPrint(String leader, vector<T> const &v1, vector<T> const &v2) {
@@ -40,9 +40,99 @@ class indexName {
     }
 };
 
+// test operation of iterator
+void testIterator() {
+  Serial.println("\nline 45 testIterator function");
+  Serial.println("\nline 46 Testing vector<int>::size_type and vector<String>::size_type");
+  vector<int> vi1{1, 9, 3, 7, 5};
+  vector<String> vs1{"Happy", "go", "lucky", "and", "many", "happy", "returns"};
+  for (vector<int>::size_type i = 0; i < vi1.size(); i++) {
+    Serial.print(vi1.at(i));
+    Serial.print(' ');
+  }
+  for (vector<String>::size_type i = 0; i < vs1.size(); i++) {
+    Serial.print(vs1.at(i));
+    Serial.print(' ');
+  }
+  Serial.print("\n\nline 57 Testing vector<int>::iterator and vector<String>::iterator");
+  Serial.print("\n begin points to ");
+  Serial.print(*vi1.begin());
+    Serial.print(' ');
+  Serial.print(*vs1.begin());
+  Serial.print("\n end points to ");
+  Serial.print(*(vi1.end() - 1));
+    Serial.print(' ');
+  Serial.print(*(vs1.end() - 1));
+  Serial.print("\n whole vector is ");
+  for (vector<int>::iterator p = vi1.begin(); p < vi1.end(); p++) {
+    Serial.print(*p);
+    Serial.print(' ');
+  }
+  Serial.print("\n whole vector is ");
+  for (vector<String>::iterator p = vs1.begin(); p < vs1.end(); p++) {
+    Serial.print(*p);
+    Serial.print(' ');
+  }
+  Serial.print("\n\nline 76 Testing range for loop with iterator");
+  Serial.print("\n whole vector is "); // page 119
+  for (int x : vi1) {
+    Serial.print(x);
+    Serial.print(' ');
+  }
+  for (String x : vs1) {
+    Serial.print(x);
+    Serial.print(' ');
+  }
+  Serial.print("\n\nline 86 Testing erase function");
+  vector<int>::iterator q = vi1.begin()+1;
+    Serial.print("\n item be erased is ");
+    Serial.print(*q);
+  vector<String>::iterator qs = vs1.begin()+1;
+    Serial.print("\n item be erased is ");
+    Serial.print(*qs);
+  q = vi1.erase(q);  // erase element 1 (2nd element)
+  qs = vs1.erase(qs);  // erase element 1 (2nd element)
+  Serial.print("\n whole vector is now "); // page 119
+  for (int x : vi1) {
+    Serial.print(x);
+    Serial.print(' ');
+  }
+  for (String x : vs1) {
+    Serial.print(x);
+    Serial.print(' ');
+  }
+  Serial.print("\n item taking the place of the erased item is ");
+    Serial.print(*q);
+    Serial.print(" and ");
+    Serial.print(*qs);
+    
+  Serial.print("\n\nline 109 Testing insert function");
+  q = vi1.begin()+1;
+  qs = vs1.begin()+1;
+    Serial.print("\n item to be inserted is 24 and 'anything'");
+  q = vi1.insert(q, 24);  // insert at element 1 (2nd element)
+  qs = vs1.insert(qs, "anything");  // insert at element 1 (2nd element)
+  Serial.print("\n whole vector is now ");
+  for (int x : vi1) {
+    Serial.print(x);
+    Serial.print(' ');
+  }
+  for (String x : vs1) {
+    Serial.print(x);
+    Serial.print(' ');
+  }
+  Serial.print("\n item that was inserted is ");
+    Serial.print(*q);
+    Serial.print(" and ");
+    Serial.print(*qs);
+
+  Serial.println();
+
+} // end of void testIterator()
+
 // test constructor for zero length vector:  vector<T> v
 void testZeroLength(bool ve) {
-  Serial.print("\nline 45 Testing zero length vector constructor vector<T> v");
+  Serial.print("\nline 135 Testing zero length vector constructor vector<T> v");
   vector<char> vc1;
   if (ve) {
     Serial.print("\nchar     vc1.size()="); Serial.print(vc1.size());
@@ -113,7 +203,7 @@ void testZeroLength(bool ve) {
       Serial.print(" vf1[" + String(i) + "]=" + String(vf1[i]));
     }
   }
-  if (ve) Serial.println();
+  Serial.println();
 } // end of void testZeroLength()
 
 // test constructor for vector of s elements:  vector<T> v(s)
@@ -185,7 +275,7 @@ void testNonZeroLength(bool ve) {
       Serial.print(" vf1[" + String(i) + "]=" + String(vf1[i]));
     }
   }
-  if (ve) Serial.println();
+  Serial.println();
 } // end of void testNonZeroLength()
 
 // test constructor for initializer list vector:  vector<T> v{1,2,3}
@@ -257,7 +347,7 @@ void testInitializerListVector(bool ve) {
       Serial.print(" vf1[" + String(i) + "]=" + String(vf1[i]));
     }
   }
-  if (ve) Serial.println();
+  Serial.println();
 } // end of void testInitializerListVector()
 
 // test copy constructor:  vector() v1
@@ -346,7 +436,7 @@ void testCopyConstructor(bool ve) {
       Serial.print(" vf1[" + String(i) + "]=" + String(vf1[i]));
     }
   }
-  if (ve) Serial.println();
+  Serial.println();
 } // end of void testCopyConstructor()
 
 // test move constructor:  vector() v1 ?
@@ -413,63 +503,63 @@ void testCopyAssignment(bool ve) {
   if (ve) dualVectorPrint("\nbefore char     ", vc1, vc2);
   vc1 = vc2;
   if (ve) dualVectorPrint("\nafter  char     ", vc1, vc2);
-  if (ve) Serial.println();
+  Serial.println();
 
   vector<int> vi2{4, 5, 6};
   vector<int> vi1{1, 2};
   if (ve) dualVectorPrint("\nbefore int      ", vi1, vi2);
   vi1 = vi2;
   if (ve) dualVectorPrint("\nafter  int      ", vi1, vi2);
-  if (ve) Serial.println();
+  Serial.println();
 
   vector<double> vd2{4, 5, 6};
   vector<double> vd1{1, 2};
   if (ve) dualVectorPrint("\nbefore double   ", vd1, vd2);
   vd1 = vd2;
   if (ve) dualVectorPrint("\nafter  double   ", vd1, vd2);
-  if (ve) Serial.println();
+  Serial.println();
 
   vector<String> vs2{"Happy", "go", "Lucky"};
   vector<String> vs1{"Grumpy"};
   if (ve) dualVectorPrint("\nbefore String   ", vs1, vs2);
   vs1 = vs2;
   if (ve) dualVectorPrint("\nafter  String   ", vs1, vs2);
-  if (ve) Serial.println();
+  Serial.println();
 
   vector<bool> vb2{1, 0, 1};
   vector<bool> vb1{1};
   if (ve) dualVectorPrint("\nbefore bool     ", vb1, vb2);
   vb1 = vb2;
   if (ve) dualVectorPrint("\nafter  bool     ", vb1, vb2);
-  if (ve) Serial.println();
+  Serial.println();
 
   vector<byte> vy2{4, 5, 6};
   vector<byte> vy1{1};
   if (ve) dualVectorPrint("\nbefore byte     ", vy1, vy2);
   vy1 = vy2;
   if (ve) dualVectorPrint("\nafter  byte     ", vy1, vy2);
-  if (ve) Serial.println();
+  Serial.println();
 
   vector<uint16_t> vu2{4, 5, 6};
   vector<uint16_t> vu1{1};
   if (ve) dualVectorPrint("\nbefore uint16_t ", vu1, vu2);
   vu1 = vu2;
   if (ve) dualVectorPrint("\nafter  uint16_t ", vu1, vu2);
-  if (ve) Serial.println();
+  Serial.println();
 
   vector<unsigned long> vl2{4, 5, 6};
   vector<unsigned long> vl1{1};
   if (ve) dualVectorPrint("\nbefore u long  ", vl1, vl2);
   vl1 = vl2;
   if (ve) dualVectorPrint("\nafter  u long  ", vl1, vl2);
-  if (ve) Serial.println();
+  Serial.println();
 
   vector<float> vf2{4, 5, 6};
   vector<float> vf1{1};
   if (ve) dualVectorPrint("\nbefore float   ", vf1, vf2);
   vf1 = vf2;
   if (ve) dualVectorPrint("\nafter  float   ", vf1, vf2);
-  if (ve) Serial.println();
+  Serial.println();
 } // end of void testCopyAssignment()
 
 // test move assignment:  v1 ? v2
@@ -975,8 +1065,9 @@ void checkVectorSize(bool ve) {
 
 void setup() {
   Serial.begin(115200);
-  Serial.print("\nStarting vector3.ino");
+  Serial.print("\nStarting testing_vector.ino");
 
+  testIterator();
   checkVectorSize(1);
   testLargeVectors(1); // line 672
   testMemoryLeak(1);   // line 714
@@ -1001,8 +1092,8 @@ void setup() {
 void loop() {
   static int counter = 0;
   counter++;
-  if (counter % 12 == 0) delay(777);
-  else delay(767); // 233 ms for testMemoryLeak function, total 1000 ms
+  if (counter % 100 == 0) delay(879);
+  else delay(400); // 120 ms for testMemoryLeak function, total 1000 ms
   testLargeVectors(0);  // indefinite
   testMemoryLeak(0);    // indefinite
 

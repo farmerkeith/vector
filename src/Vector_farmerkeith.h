@@ -45,7 +45,7 @@ class vector { // vector of Ts
     // vector function. Default is all set to 0. Setting an individual bit
     // to "1" enables a Serial.print() message or messages from that function.
     // To change the values, go the the function "setDebugBits" at the end of this file
-    // or write the values directly, eg "v.debug.ZeroLength = 1;" 
+    // or write the values directly, eg "v.debug.ZeroLength = 1;"
     // where v is the name of your vector.
     struct debugBits { //                                     2 bytes
       unsigned ZeroLength       : 1 ; // 12
@@ -62,6 +62,11 @@ class vector { // vector of Ts
       unsigned Reserve          : 1 ; // 1
       unsigned PushBack         : 1 ; // 0
     } debug;     // was 13 bool -> 13 bytes
+
+    using size_type = uint16_t;          //    page 730
+    using value_type = T;
+    using iterator = T*;                 // pointer to element
+    using const_iterator = const T*;
 
     vector(); // constructor for zero length vector
 
@@ -103,7 +108,7 @@ class vector { // vector of Ts
       return at(n, out_of_range); // out_of_range is discarded
     }
 
-    int size() const {
+    size_type size() const {
       return sz;  // get size
     }
 
@@ -129,7 +134,30 @@ class vector { // vector of Ts
 
     void reserve (uint16_t newalloc); // see p692. Definition below.
 
-    void setDebugBits();
+    void setDebugBits();  // control printing of debug messages, see definition below.
+
+    iterator begin() {
+      return &elem[0]; //   page 730
+    }
+    const_iterator begin() const {
+      return &elem[0]; // pointer to the first element
+    }
+    iterator end() {
+      return &elem[sz];
+    }
+    const_iterator end() const {
+      return &elem[sz];
+    }
+
+    // the following insert and erase are not range checked
+    iterator insert (iterator p, const T& val); // inserts val at vector position p
+    iterator erase (iterator p); // removes the vector element at position p
+
+  private:
+    uint16_t calcSpace() {
+      return max(space + 4, (int)((float)space * 1.1)); // "magic constants 4 & 1.1"
+    }
+
 
 }; // end of class vector
 
@@ -285,7 +313,7 @@ void vector<T, A>::push_back(const T& val) { // page 692
       Serial.print(space);
     }
   }
-  int newSpace = max(space + 4, (int)((float)space * 1.1)); // "magic constants 4 & 1.1"
+  uint16_t newSpace = calcSpace();
   if (debug.PushBack) {
     if (sz % 100 == 0) {
       Serial.print("\n(debug) newSpace=");
@@ -315,22 +343,45 @@ void vector<T, A>::resize(uint16_t newsize, T val = T()) { // page 692
   if (debug.Resize) Serial.print("\n(debug) Resize for vector");
 } // end of void vector<T, A>::resize
 
+template<typename T, typename A>  // removes the vector element at position p
+typename vector<T, A>::iterator vector<T, A>::erase (iterator p) {  // page 746
+  if (p == end()) return p;
+  for (auto pos = p + 1; pos != end(); ++pos)
+    *(pos - 1) = *pos;     // copy element one to the left
+  alloc.destroy(&*(end() - 1)); // destroy surplus copy of last element
+  --sz;
+  return p;
+} // end of typename vector<T, A>::iterator vector<T, A>::erase (iterator p)
+
+template<typename T, typename A> // inserts val at vector position p
+typename vector<T, A>::iterator vector<T, A>::insert (iterator p, const T& val) {  // page 746
+  uint16_t index = p - begin(); // p will become invalid if reserve() is used
+  if (size() == capacity()) reserve (calcSpace()); // same function used by push_back
+  alloc.construct (elem + sz, *end()); // was back()?? new space needs to be initialized ("constructed")
+  ++sz;
+  iterator pp = begin() + index; // the place to put val.
+  for (auto pos = end() - 1; pos != pp; --pos)
+    *pos = *(pos - 1);  // copy element one to the right
+  *(begin() + index) = val; // store val
+  return pp;
+} // end of typename vector<T, A>::iterator vector<T, A>::insert (iterator p, const T& val)
+
 template<typename T, typename A>
 void vector<T, A>::setDebugBits() {
-      debug.ZeroLength       = 0; // 12
-      debug.NonZeroLength    = 0; // 11
-      debug.InitializerList  = 0; // 10
-      debug.CopyConstructor  = 0; // 9
-      debug.MoveConstructor  = 0; // 8
-      debug.CopyAssignment   = 0; // 7
-      debug.MoveAssignment   = 0; // 6
-      debug.Access           = 0; // 5
-      debug.OutOfRangeAccess = 0; // 4
-      debug.Delete           = 0; // 3
-      debug.Resize           = 0; // 2
-      debug.Reserve          = 0; // 1
-      debug.PushBack         = 0; // 0
-    } // end of void setDebugBits()
+  debug.ZeroLength       = 0; // 12
+  debug.NonZeroLength    = 0; // 11
+  debug.InitializerList  = 0; // 10
+  debug.CopyConstructor  = 0; // 9
+  debug.MoveConstructor  = 0; // 8
+  debug.CopyAssignment   = 0; // 7
+  debug.MoveAssignment   = 0; // 6
+  debug.Access           = 0; // 5
+  debug.OutOfRangeAccess = 0; // 4
+  debug.Delete           = 0; // 3
+  debug.Resize           = 0; // 2
+  debug.Reserve          = 0; // 1
+  debug.PushBack         = 0; // 0
+} // end of void setDebugBits()
 
 #endif
 // end of file
