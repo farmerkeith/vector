@@ -1,6 +1,16 @@
 // file testing_vector.ino
 // file created 31 August 2019 by farmerkeith
-// last update 1 September 2019
+// last update 2 September 2019
+
+// using namespace std;
+// using std::sort;
+// using std::algorithm::sort;
+// using namespace std::algorithm;
+// using std::algorithm;
+// #include <algorithm>
+// using algorithm::sort;
+// using std::vector;
+
 #include "Vector_farmerkeith.h" // tab file
 
 template<typename T>
@@ -17,32 +27,125 @@ void dualVectorPrint(String leader, vector<T> const &v1, vector<T> const &v2) {
   // if(T=='char') Serial.print("char");
 }
 
-class indexName {
+class userType {
   public:
-    int index;
-    String Name;
-    indexName () {
-      index = 0;
-      Name = "";
+    bool bo1{0};
+    char ch1{' '};
+    int in1{0};
+    float fl1{0};
+    String st1{""};
+    // constructors
+    userType (bool bo, char ch, int in, float fl, String st) {
+      bo1 = bo;
+      ch1 = ch;
+      in1 = in;
+      fl1 = fl;
+      st1 = st;
     }
-    // indexName (int index1, String Name1);
-    indexName (int index1, String Name1) {
-      index = index1;
-      Name = Name1;
-    }
-    indexName (int index1) {
-      index = index1;
-      Name = "";
-    }
-    indexName (String Name1) {
-      index = 0;
-      Name = Name1;
-    }
+    userType (bool bo) { bo1 = bo; } // constructor
+    userType (char ch) { ch1 = ch; }
+    userType (int in)  { in1 = in; }
+    userType (float fl) {fl1 = fl; }
+    userType (String st) { st1 = st;}
+    userType () { } // constructor
+
+    String out() {
+      String te = String(bo1) + ' ';
+      te += String(ch1) + ' ' + String(in1) + ' ' ;
+      te += (String)fl1 + ' ' + st1;
+      return te;
+    } // end of String ()
+
+/*    String operator()() {
+      String te = String(bo1) + ' ';
+      te += String(ch1) + ' ' + String(in1) + ' ' ;
+      te += (String)fl1 + ' ' + st1;
+      return te;
+    } // end of String ()
+*/
 };
+
+// test operation of clear() function
+void testClear(bool ve) {
+  Serial.print("\nTesting clear function");
+  vector<String>vs1{"Happy","go","lucky","friends","enemies"};
+  Serial.print("\n0 string vs1.size()="); Serial.print(vs1.size());
+  Serial.print(" vs1.capacity()="); Serial.println(vs1.capacity());
+  for (String x : vs1) Serial.println (x);
+  vs1.clear();
+  vs1.resize(1);
+  Serial.print("\n1 string vs1.size()="); Serial.print(vs1.size());
+  Serial.print(" vs1.capacity()="); Serial.println(vs1.capacity());
+  for (String x : vs1) Serial.println (x);
+  vs1.push_back("healthy");
+  Serial.print("\n2 string vs1.size()="); Serial.print(vs1.size());
+  Serial.print(" vs1.capacity()="); Serial.println(vs1.capacity());
+  for (String x : vs1) Serial.println (x);
+
+  vector<userType>vut1{(String)"Happy",(String)"go",(String)"lucky",(String)"friends",(String)"enemies"};
+  Serial.print("\n0 userType vut1.size()="); Serial.print(vut1.size());
+  Serial.print(" vut1.capacity()="); Serial.println(vut1.capacity());
+  for (userType x : vut1) Serial.println (x.out());
+  vut1.clear();
+  vut1.resize(0);
+  Serial.print("\n1 userType vut1.size()="); Serial.print(vut1.size());
+  Serial.print(" vut1.capacity()="); Serial.println(vut1.capacity());
+  for (userType x : vut1) Serial.println (x.out());
+  vut1.push_back((String)"healthy");
+  Serial.print("\n2 userType vut1.size()="); Serial.print(vut1.size());
+  Serial.print(" vut1.capacity()="); Serial.println(vut1.capacity());
+  for (userType x : vut1) Serial.println (x.out());
+} // end of void testClear(bool ve) 
+
+// test operation of std::algorithms
+void testAlgorithms() {
+  vector<int> vi = {5, 7, 9, 4, 6, 8}; // vector from std:
+  Serial.print("\n whole vector vi is ");
+  for (vector<int>::iterator p = vi.begin(); p < vi.end(); p++) {
+    Serial.print(*p);
+    Serial.print(' ');
+  }
+  std::sort (vi.begin(), vi.end()); // sort algorithm from std:
+
+  Serial.print("\n whole vector vi is ");
+  for (vector<int>::iterator p = vi.begin(); p < vi.end(); p++) {
+    Serial.print(*p);
+    Serial.print(' ');
+  }
+  vector<String> vs1{"Happy", "go", "lucky", "and", "many", "happy", "returns"};
+  Serial.print("\n whole vector vs1 is ");
+  for (vector<String>::iterator p = vs1.begin(); p < vs1.end(); p++) {
+    Serial.print(*p);
+    Serial.print(' ');
+  }
+  Serial.print("\n Sorting vector vs1 results in ");
+  std::sort (vs1.begin(), vs1.end()); // sort algorithm from std:
+
+  Serial.print("\n whole vector vs1 is ");
+  for (vector<String>::iterator p = vs1.begin(); p < vs1.end(); p++) {
+    Serial.print(*p);
+    Serial.print(' ');
+  }
+
+  Serial.print("\n using Find lucky");
+  vector<String>::iterator p = std::find(vs1.begin(), vs1.end(), "lucky");
+  Serial.print("\n result is ");
+  Serial.print(*p);
+  Serial.print(" at position ");
+  Serial.print((p - vs1.begin()));
+
+  Serial.print("\n Inserting 'at last' in that position results in ");
+  vs1.insert(p, "at last");
+  Serial.print("\n resulting vector vs1 is ");
+  for (vector<String>::iterator p = vs1.begin(); p < vs1.end(); p++) {
+    Serial.print(*p);
+    Serial.print(' ');
+  }
+} // end of void testAlgorithms()
 
 // test operation of iterator
 void testIterator() {
-  Serial.println("\nline 45 testIterator function");
+  Serial.println("\n\nline 45 testIterator function");
   Serial.println("\nline 46 Testing vector<int>::size_type and vector<String>::size_type");
   vector<int> vi1{1, 9, 3, 7, 5};
   vector<String> vs1{"Happy", "go", "lucky", "and", "many", "happy", "returns"};
@@ -57,11 +160,11 @@ void testIterator() {
   Serial.print("\n\nline 57 Testing vector<int>::iterator and vector<String>::iterator");
   Serial.print("\n begin points to ");
   Serial.print(*vi1.begin());
-    Serial.print(' ');
+  Serial.print(' ');
   Serial.print(*vs1.begin());
   Serial.print("\n end points to ");
   Serial.print(*(vi1.end() - 1));
-    Serial.print(' ');
+  Serial.print(' ');
   Serial.print(*(vs1.end() - 1));
   Serial.print("\n whole vector is ");
   for (vector<int>::iterator p = vi1.begin(); p < vi1.end(); p++) {
@@ -84,12 +187,12 @@ void testIterator() {
     Serial.print(' ');
   }
   Serial.print("\n\nline 86 Testing erase function");
-  vector<int>::iterator q = vi1.begin()+1;
-    Serial.print("\n item be erased is ");
-    Serial.print(*q);
-  vector<String>::iterator qs = vs1.begin()+1;
-    Serial.print("\n item be erased is ");
-    Serial.print(*qs);
+  vector<int>::iterator q = vi1.begin() + 1;
+  Serial.print("\n item be erased is ");
+  Serial.print(*q);
+  vector<String>::iterator qs = vs1.begin() + 1;
+  Serial.print("\n item be erased is ");
+  Serial.print(*qs);
   q = vi1.erase(q);  // erase element 1 (2nd element)
   qs = vs1.erase(qs);  // erase element 1 (2nd element)
   Serial.print("\n whole vector is now "); // page 119
@@ -102,14 +205,14 @@ void testIterator() {
     Serial.print(' ');
   }
   Serial.print("\n item taking the place of the erased item is ");
-    Serial.print(*q);
-    Serial.print(" and ");
-    Serial.print(*qs);
-    
+  Serial.print(*q);
+  Serial.print(" and ");
+  Serial.print(*qs);
+
   Serial.print("\n\nline 109 Testing insert function");
-  q = vi1.begin()+1;
-  qs = vs1.begin()+1;
-    Serial.print("\n item to be inserted is 24 and 'anything'");
+  q = vi1.begin() + 1;
+  qs = vs1.begin() + 1;
+  Serial.print("\n item to be inserted is 24 and 'anything'");
   q = vi1.insert(q, 24);  // insert at element 1 (2nd element)
   qs = vs1.insert(qs, "anything");  // insert at element 1 (2nd element)
   Serial.print("\n whole vector is now ");
@@ -122,17 +225,37 @@ void testIterator() {
     Serial.print(' ');
   }
   Serial.print("\n item that was inserted is ");
-    Serial.print(*q);
-    Serial.print(" and ");
-    Serial.print(*qs);
+  Serial.print(*q);
+  Serial.print(" and ");
+  Serial.print(*qs);
 
   Serial.println();
 
 } // end of void testIterator()
 
+// test constructors for userType class
+void testuserType(bool ve) {
+  userType ut1;
+  ut1.st1="Entry";
+  userType ut2((bool)1);
+  userType ut3('a');
+  userType ut4((int)100);
+  userType ut5((float)10.5);
+  userType ut6((String)"Six");
+  userType ut7((bool)1, 'a', (int)75, (float)15.6, "Seven");
+  Serial.print("\nPrint user types");
+  Serial.print("\nut1.out()="); Serial.print(ut1.out());
+  Serial.print("\nut2.out()="); Serial.print(ut2.out());
+  Serial.print("\nut3.out()="); Serial.print(ut3.out());
+  Serial.print("\nut4.out()="); Serial.print(ut4.out());
+  Serial.print("\nut5.out()="); Serial.print(ut5.out());
+  Serial.print("\nut6.out()="); Serial.print(ut6.out());
+  Serial.print("\nut7.out()="); Serial.print(ut7.out());
+} // end of void testuserType(bool ve)
+
 // test constructor for zero length vector:  vector<T> v
 void testZeroLength(bool ve) {
-  Serial.print("\nline 135 Testing zero length vector constructor vector<T> v");
+  Serial.print("\nline 219 Testing zero length vector constructor vector<T> v");
   vector<char> vc1;
   if (ve) {
     Serial.print("\nchar     vc1.size()="); Serial.print(vc1.size());
@@ -201,6 +324,15 @@ void testZeroLength(bool ve) {
     Serial.print("\nfloat    vf1.size()="); Serial.print(vf1.size());
     for (int i = 0; i < vf1.size(); i++) {
       Serial.print(" vf1[" + String(i) + "]=" + String(vf1[i]));
+    }
+  }
+  Serial.println();
+
+  vector<userType> vut1;
+  if (ve) {
+    Serial.print("\nuserType vut1.size()="); Serial.print(vut1.size());
+     for (int i = 0; i < vut1.size(); i++) {
+       Serial.print(" vut1[" + String(i) + "]=" + String(vut1[i].out()));
     }
   }
   Serial.println();
@@ -275,6 +407,13 @@ void testNonZeroLength(bool ve) {
       Serial.print(" vf1[" + String(i) + "]=" + String(vf1[i]));
     }
   }
+//  vector<userType> vut1(3);
+//  if (ve) {
+//    Serial.print("\nuserType vut1.size()="); Serial.print(vut1.size());
+//     for (int i = 0; i < vut1.size(); i++) {
+//       Serial.print(" vut1[" + String(i) + "]=" + String(vut1[i]()));
+//    }
+//  }
   Serial.println();
 } // end of void testNonZeroLength()
 
@@ -975,7 +1114,7 @@ void testResizeString(bool ve) {
 // test large vectors
 void testLargeVectors(bool ve) {
   Serial.print("\n line 887 testing LargeVectors char");
-  int large = 1000; // 600 crash at 2000?
+  int large = 900; // 600 crash at 2000?
   vector<char>vc1;
   for (int i = 0; i < large; i++) {
     vc1.push_back(char((i % 26) + 'a'));
@@ -1021,7 +1160,7 @@ void testLargeVectors(bool ve) {
 
 // test memory leak
 void  testMemoryLeak(bool ve) {
-  int large = 1300; // max 1400
+  int large = 1200; // max 1400
   Serial.print("\n line 935 testing for memory leak with a String vector");
   // vector<String>vs1(10);         // create 100 size empty vector
   // vector<String>vs1(large);       // create full size empty vector
@@ -1066,7 +1205,10 @@ void checkVectorSize(bool ve) {
 void setup() {
   Serial.begin(115200);
   Serial.print("\nStarting testing_vector.ino");
-
+  testClear(1);
+  testuserType(1);
+/*
+  testAlgorithms();
   testIterator();
   checkVectorSize(1);
   testLargeVectors(1); // line 672
@@ -1082,9 +1224,9 @@ void setup() {
   testCopyAssignment(0);  // line 310
   testCopyConstructor(0); // line 198
   testInitializerListVector(0); // line 147
-  testNonZeroLength(0);        // line 96
-  testZeroLength(0);          // line 45
-
+*/
+  testNonZeroLength(1);        // line 96
+  testZeroLength(1);          // line 45
   Serial.print("\nEnd of setup test series");
   Serial.println("\nEnd of setup");
 } // end of setup()

@@ -61,6 +61,7 @@ class vector { // vector of Ts
       unsigned Resize           : 1 ; // 2
       unsigned Reserve          : 1 ; // 1
       unsigned PushBack         : 1 ; // 0
+      unsigned Clear            : 1 ; // 0
     } debug;     // was 13 bool -> 13 bytes
 
     using size_type = uint16_t;          //    page 730
@@ -152,6 +153,9 @@ class vector { // vector of Ts
     // the following insert and erase are not range checked
     iterator insert (iterator p, const T& val); // inserts val at vector position p
     iterator erase (iterator p); // removes the vector element at position p
+
+    // clear function - resets size to 0 and de-allocates the memory reserved for elements
+    void clear(); 
 
   private:
     uint16_t calcSpace() {
@@ -250,10 +254,22 @@ vector<T, A>& vector<T, A>::operator=(vector&& arg) // move assignment, see p639
 template<typename T, typename A>
 vector<T, A>::~vector() // destructor
 {
-  if (debug.Delete) Serial.print("\n(debug) line 187 Delete vector");
+  if (debug.Delete) Serial.print("\n(debug) line 256 Delete vector");
   for (int i = 0; i < sz; ++i) alloc.destroy(&elem[i]); // from Zac
   alloc.deallocate(elem, space);  // deallocate space
 } // end of ~vector() (destructor)
+
+// --------------------------------------------------
+template<typename T, typename A>
+void vector<T, A>::clear() // clear function
+{
+  if (debug.Clear) Serial.print("\n(debug) Clear vector");
+  for (int i = 0; i < sz; ++i) alloc.destroy(&elem[i]); 
+  // alloc.deallocate(elem, space);  // deallocate space
+  sz = 0;
+  // space = 0;
+  extra=T{};
+} // end of vector<T, A>::clear()
 
 template<typename T, typename A>
 const T& vector<T, A>::at(int n, bool& out_of_range) const {  // checked access for read/write // was T&
@@ -307,7 +323,7 @@ template<typename T, typename A>
 void vector<T, A>::push_back(const T& val) { // page 692
   if (debug.PushBack) {
     if (sz % 100 == 0) {
-      Serial.print("\n(debug) push_back line 307 sz=");
+      Serial.print("\n(debug) push_back line 326 sz=");
       Serial.print(sz);
       Serial.print(" space=");
       Serial.print(space);
@@ -368,19 +384,20 @@ typename vector<T, A>::iterator vector<T, A>::insert (iterator p, const T& val) 
 
 template<typename T, typename A>
 void vector<T, A>::setDebugBits() {
-  debug.ZeroLength       = 0; // 12
-  debug.NonZeroLength    = 0; // 11
-  debug.InitializerList  = 0; // 10
-  debug.CopyConstructor  = 0; // 9
-  debug.MoveConstructor  = 0; // 8
-  debug.CopyAssignment   = 0; // 7
-  debug.MoveAssignment   = 0; // 6
-  debug.Access           = 0; // 5
-  debug.OutOfRangeAccess = 0; // 4
-  debug.Delete           = 0; // 3
-  debug.Resize           = 0; // 2
-  debug.Reserve          = 0; // 1
-  debug.PushBack         = 0; // 0
+  debug.ZeroLength       = 0; // 13
+  debug.NonZeroLength    = 0; // 12
+  debug.InitializerList  = 0; // 11
+  debug.CopyConstructor  = 0; // 10
+  debug.MoveConstructor  = 0; // 9
+  debug.CopyAssignment   = 0; // 8
+  debug.MoveAssignment   = 0; // 7
+  debug.Access           = 0; // 6
+  debug.OutOfRangeAccess = 0; // 5
+  debug.Delete           = 0; // 4
+  debug.Resize           = 0; // 3
+  debug.Reserve          = 0; // 2
+  debug.PushBack         = 0; // 1
+  debug.Clear            = 0; // 0
 } // end of void setDebugBits()
 
 #endif
