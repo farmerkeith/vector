@@ -1,6 +1,6 @@
 // file testing_vector.ino
 // file created 31 August 2019 by farmerkeith
-// last update 2 September 2019
+// last update 8 September 2019
 
 // using namespace std;
 // using std::sort;
@@ -68,37 +68,47 @@ class userType {
 // test operation of clear() function
 void testClear(bool ve) {
   Serial.print("\nTesting clear function");
+
   vector<String>vs1{"Happy","go","lucky","friends","enemies"};
-  Serial.print("\n0 string vs1.size()="); Serial.print(vs1.size());
+  Serial.print("\nline 73 0 string vs1.size()="); Serial.print(vs1.size());
   Serial.print(" vs1.capacity()="); Serial.println(vs1.capacity());
   for (String x : vs1) Serial.println (x);
+  Serial.print("\nline 76 String vs1.clear()");
   vs1.clear();
-  vs1.resize(1);
-  Serial.print("\n1 string vs1.size()="); Serial.print(vs1.size());
+  Serial.print("\nline 78 String vs1.resize(10)");
+  vs1.resize(10);
+  Serial.print("\nline 80 1 string vs1.size()="); Serial.print(vs1.size());
   Serial.print(" vs1.capacity()="); Serial.println(vs1.capacity());
   for (String x : vs1) Serial.println (x);
-  vs1.push_back("healthy");
-  Serial.print("\n2 string vs1.size()="); Serial.print(vs1.size());
+  vs1.push_back("String healthy");
+  Serial.print("\nline 84 2 string vs1.size()="); Serial.print(vs1.size());
   Serial.print(" vs1.capacity()="); Serial.println(vs1.capacity());
   for (String x : vs1) Serial.println (x);
 
+
   vector<userType>vut1{(String)"Happy",(String)"go",(String)"lucky",(String)"friends",(String)"enemies"};
-  Serial.print("\n0 userType vut1.size()="); Serial.print(vut1.size());
+  Serial.print("\nline 90 0 userType vut1.size()="); Serial.print(vut1.size());
   Serial.print(" vut1.capacity()="); Serial.println(vut1.capacity());
   for (userType x : vut1) Serial.println (x.out());
+  Serial.print("\nline 93 userType vut1.clear()");
   vut1.clear();
-  vut1.resize(0);
-  Serial.print("\n1 userType vut1.size()="); Serial.print(vut1.size());
+  Serial.print("\nlilne 95 userType vut1.resize(1)");
+  vut1.resize(1);
+  Serial.print("\nline 97 1 userType vut1.size()="); Serial.print(vut1.size());
   Serial.print(" vut1.capacity()="); Serial.println(vut1.capacity());
   for (userType x : vut1) Serial.println (x.out());
-  vut1.push_back((String)"healthy");
-  Serial.print("\n2 userType vut1.size()="); Serial.print(vut1.size());
+  Serial.print("\nline 100 userType vut1.push_back((String)\"userType healthy\")");
+  vut1.push_back((String)"userType healthy");
+  Serial.print("\nline 102 2 userType vut1.size()="); Serial.print(vut1.size());
   Serial.print(" vut1.capacity()="); Serial.println(vut1.capacity());
   for (userType x : vut1) Serial.println (x.out());
+
 } // end of void testClear(bool ve) 
 
 // test operation of std::algorithms
 void testAlgorithms() {
+  // ToDo: test userType
+  Serial.println("\n\nline 111 testAlgorithms function");
   vector<int> vi = {5, 7, 9, 4, 6, 8}; // vector from std:
   Serial.print("\n whole vector vi is ");
   for (vector<int>::iterator p = vi.begin(); p < vi.end(); p++) {
@@ -145,8 +155,9 @@ void testAlgorithms() {
 
 // test operation of iterator
 void testIterator() {
-  Serial.println("\n\nline 45 testIterator function");
-  Serial.println("\nline 46 Testing vector<int>::size_type and vector<String>::size_type");
+  // ToDo: userType test(s)
+  Serial.println("\n\nline 159 testIterator function");
+  Serial.println("\nline 160 Testing vector<int>::size_type and vector<String>::size_type");
   vector<int> vi1{1, 9, 3, 7, 5};
   vector<String> vs1{"Happy", "go", "lucky", "and", "many", "happy", "returns"};
   for (vector<int>::size_type i = 0; i < vi1.size(); i++) {
@@ -157,7 +168,7 @@ void testIterator() {
     Serial.print(vs1.at(i));
     Serial.print(' ');
   }
-  Serial.print("\n\nline 57 Testing vector<int>::iterator and vector<String>::iterator");
+  Serial.print("\n\nline 171 Testing vector<int>::iterator and vector<String>::iterator");
   Serial.print("\n begin points to ");
   Serial.print(*vi1.begin());
   Serial.print(' ');
@@ -176,7 +187,7 @@ void testIterator() {
     Serial.print(*p);
     Serial.print(' ');
   }
-  Serial.print("\n\nline 76 Testing range for loop with iterator");
+  Serial.print("\n\nline 190 Testing range for loop with iterator");
   Serial.print("\n whole vector is "); // page 119
   for (int x : vi1) {
     Serial.print(x);
@@ -186,7 +197,7 @@ void testIterator() {
     Serial.print(x);
     Serial.print(' ');
   }
-  Serial.print("\n\nline 86 Testing erase function");
+  Serial.print("\n\nline 200 Testing erase function");
   vector<int>::iterator q = vi1.begin() + 1;
   Serial.print("\n item be erased is ");
   Serial.print(*q);
@@ -209,7 +220,7 @@ void testIterator() {
   Serial.print(" and ");
   Serial.print(*qs);
 
-  Serial.print("\n\nline 109 Testing insert function");
+  Serial.print("\n\nline 223 Testing insert function");
   q = vi1.begin() + 1;
   qs = vs1.begin() + 1;
   Serial.print("\n item to be inserted is 24 and 'anything'");
@@ -235,6 +246,7 @@ void testIterator() {
 
 // test constructors for userType class
 void testuserType(bool ve) {
+  Serial.println("\n\nline 249 testuserType function");
   userType ut1;
   ut1.st1="Entry";
   userType ut2((bool)1);
@@ -255,7 +267,8 @@ void testuserType(bool ve) {
 
 // test constructor for zero length vector:  vector<T> v
 void testZeroLength(bool ve) {
-  Serial.print("\nline 219 Testing zero length vector constructor vector<T> v");
+
+  Serial.print("\n\nline 271 Testing zero length vector constructor vector<T> v");
   vector<char> vc1;
   if (ve) {
     Serial.print("\nchar     vc1.size()="); Serial.print(vc1.size());
@@ -326,7 +339,7 @@ void testZeroLength(bool ve) {
       Serial.print(" vf1[" + String(i) + "]=" + String(vf1[i]));
     }
   }
-  Serial.println();
+  // Serial.println();
 
   vector<userType> vut1;
   if (ve) {
@@ -340,7 +353,18 @@ void testZeroLength(bool ve) {
 
 // test constructor for vector of s elements:  vector<T> v(s)
 void testNonZeroLength(bool ve) {
-  Serial.print("\nline 121 Testing non zero length vector constructor vector<T> v(s)");
+  Serial.print("\n\nline 356 Testing non zero length vector constructor vector<T> v(s)");
+
+  vector<userType> vut1(3);
+  if (ve) {
+    Serial.print("\nuserType vut1.size()="); Serial.print(vut1.size());
+    Serial.print(" vut1.capacity()="); Serial.print(vut1.capacity());
+     for (int i = 0; i < vut1.size(); i++) {
+       // Serial.print("\n vut1[" + String(i) + "]=" + vut1[i].out());
+       Serial.print("\n vut1[" + String(i) + "]=" + vut1.at(i).out());
+    }
+  }
+  Serial.print("\nline 368");
   vector<char> vc1(3);
   if (ve) {
     Serial.print("\nchar     vc1.size()="); Serial.print(vc1.size());
@@ -349,6 +373,7 @@ void testNonZeroLength(bool ve) {
       Serial.print(" vc1[" + String(i) + "]=" + String(vc1.at(i)));
     }
   }
+
   vector<int> vi1(3);
   if (ve) {
     Serial.print("\nint      vi1.size()="); Serial.print(vi1.size());
@@ -357,6 +382,7 @@ void testNonZeroLength(bool ve) {
       Serial.print(" vi1[" + String(i) + "]=" + String(vi1.at(i)));
     }
   }
+
   vector<double> vd1(3);
   if (ve) {
     Serial.print("\ndouble   vd1.size()="); Serial.print(vd1.size());
@@ -407,19 +433,21 @@ void testNonZeroLength(bool ve) {
       Serial.print(" vf1[" + String(i) + "]=" + String(vf1[i]));
     }
   }
-//  vector<userType> vut1(3);
-//  if (ve) {
-//    Serial.print("\nuserType vut1.size()="); Serial.print(vut1.size());
-//     for (int i = 0; i < vut1.size(); i++) {
-//       Serial.print(" vut1[" + String(i) + "]=" + String(vut1[i]()));
-//    }
-//  }
   Serial.println();
 } // end of void testNonZeroLength()
 
 // test constructor for initializer list vector:  vector<T> v{1,2,3}
 void testInitializerListVector(bool ve) {
-  Serial.print("\nline 193 Testing initializer list vector constructor vector<T> v{1,2,3}");
+  Serial.print("\n\nline 441 Testing initializer list vector constructor vector<T> v{1,2,3}");
+  vector<userType> vut1{{(String)"Happy"}, {(String)"go"}, {(String)"Lucky"}};
+  if (ve) {
+    Serial.print("\nline 444 userType vut1.size()="); Serial.print(vut1.size());
+    Serial.print(" vut1.capacity()="); Serial.print(vut1.capacity());
+    for (int i = 0; i < vut1.size(); i++) {
+      Serial.print("\n vut1[" + String(i) + "]=" + vut1.at(i).out());
+    }
+  }
+
   vector<char> vc1{'a', 'b', 'c'};
   if (ve) {
     Serial.print("\nchar     vc1.size()="); Serial.print(vc1.size());
@@ -486,12 +514,14 @@ void testInitializerListVector(bool ve) {
       Serial.print(" vf1[" + String(i) + "]=" + String(vf1[i]));
     }
   }
+
   Serial.println();
 } // end of void testInitializerListVector()
 
 // test copy constructor:  vector() v1
 void testCopyConstructor(bool ve) {
-  Serial.print("\nline 265 Testing copy vector constructor vector<T> v1 = v2;");
+  // ToDo: userType test
+  Serial.print("\n\nline 518 Testing copy vector constructor vector<T> v1 = v2;");
   vector<char> vc2{'a', 'b', 'c'};
   vector<char> vc1 = vc2;
   if (ve) {
@@ -579,6 +609,11 @@ void testCopyConstructor(bool ve) {
 } // end of void testCopyConstructor()
 
 // test move constructor:  vector() v1 ?
+
+vector<userType> f1UserType() {
+  vector<userType> vut2 {{(char)'a'}, {(char)'b'}, {(char)'c'}};
+  return vut2;
+} // end of vector<char> f1Char()
 vector<char> f1Char() {
   vector<char> vc2 {'a', 'b', 'c'};
   return vc2;
@@ -597,7 +632,8 @@ vector<String> f1String() {
 } // end of vector<double> f1Double()
 
 void testMoveConstructor(bool ve) {
-  Serial.print("\nline 370 Testing move vector constructor vector v1 = ...v2");
+  // ToDo: add userType test
+  Serial.print("\nline 630 Testing move vector constructor vector v1 = ...v2");
   vector<char> vc1 = f1Char();
   if (ve) {
     Serial.print("\nchar     vc1.size()="); Serial.print(vc1.size());
@@ -636,7 +672,8 @@ void testMoveConstructor(bool ve) {
 
 // test copy assignment:  v1 = v2
 void testCopyAssignment(bool ve) {
-  Serial.print("\n\n line 410 Testing copy vector assignment v1 = v2");
+  // ToDo: test userType
+  Serial.print("\n\n line 670 Testing copy vector assignment v1 = v2");
   vector<char> vc2{'d', 'e', 'f'};
   vector<char> vc1{'a', 'b'};
   if (ve) dualVectorPrint("\nbefore char     ", vc1, vc2);
@@ -706,11 +743,12 @@ void testCopyAssignment(bool ve) {
 // test read access int x = v[i] - see existing tests, eg test copy constructor
 // test write access v[i] = x
 void testWriteAccess(bool ve) {
-  Serial.print("\n\nline 479 Testing write access v2 = v1");
+  // ToDo: test userType
+  Serial.print("\n\nline 741 Testing write access v2 = v1");
   vector<char> vc2{'d', 'e', 'f'};
   vector<char> vc1{'a', 'b', 'x', 'y'};
   // char vc2x = vc2.get_extra();
-  // Serial.print("\nline 483 Out of range value=" + (String)vc2x);
+  // Serial.print("\nline 745 Out of range value=" + (String)vc2x);
   // Serial.print("\n          Correct result is '' (empty string)");
   if (ve) dualVectorPrint("\nbefore char     ", vc1, vc2);
   vc2 = vc1;
@@ -781,18 +819,18 @@ void testWriteAccess(bool ve) {
   // vs2[1] = "fort";
   vs2.at(1, x) = "fort";
   vs2x = vs2.get_extra();
-  Serial.println("\nline 555 Out of range value of vs2="); Serial.println(vs2x);
+  Serial.println("\nline 816 Out of range value of vs2="); Serial.println(vs2x);
   if (ve) Serial.print("\n\nOut of range flag=" + (String)x);
   if (ve) dualVectorPrint("\nafter2 string   ", vs1, vs2);
-  if (ve) Serial.print("\nLine 558 write vs2.at(8, x) = 'Out';");
+  if (ve) Serial.print("\nLine 819 write vs2.at(8, x) = 'Out';");
   // vs2[1] = "Out";
   vs2.at(8, x) = "Out";
   Serial.print("\nOut of range flag=" + (String)x);
-  Serial.print("\nline 562 Out of range value of vs2=" + vs2.get_extra());
+  Serial.print("\nline 823 Out of range value of vs2=" + vs2.get_extra());
   Serial.print("\n                Correct result is 'Out'");
 
   if (ve) dualVectorPrint("\nafter3 string   ", vs1, vs2);
-  if (ve) Serial.print("\nLine 566 write vs2.at(0, x) = 'Orig';");
+  if (ve) Serial.print("\nLine 827 write vs2.at(0, x) = 'Orig';");
   // vs2[0] = "Orig";
   vs2.at(0, x) = "Orig";
   Serial.print("\nOut of range flag=" + (String)x);
@@ -800,7 +838,7 @@ void testWriteAccess(bool ve) {
   int sx1 = vs2.out_of_range();
   Serial.print("\nOut of range index of vs2=" + (String)vs2.out_of_range());
   String sx2 = vs2.get_extra();
-  Serial.print("\nline 574 Out of range value of vs2=");
+  Serial.print("\nline 835 Out of range value of vs2=");
   Serial.print(vs2.get_extra());
   Serial.print("\n                Correct result is '' (empty string)");
   if (ve) Serial.print("\nLine 577 read String rvs20 = vs2.at(0, x);");
@@ -810,11 +848,11 @@ void testWriteAccess(bool ve) {
   int xs1 = vs2.out_of_range();
   Serial.print("\nOut of range index=" + (String)xs1);
   String xs2 = vs2.get_extra();
-  Serial.print("\nline 584 Out of range value=");
+  Serial.print("\nline 845 Out of range value=");
   Serial.print(xs2);
   Serial.print("\n         Correct result is '' (empty string)");
 
-  if (ve) Serial.print("\nLine 588 read String rvs28 = vs2.at(8, x);");
+  if (ve) Serial.print("\nLine 849 read String rvs28 = vs2.at(8, x);");
   // String rvs28 = vs2[1];
   String rvs28 = vs2.at(8, x);
   if (ve) Serial.print("\nOut of range flag=" + (String)x);
@@ -822,7 +860,7 @@ void testWriteAccess(bool ve) {
   xs1 = vs2.out_of_range();
   Serial.print("\nline 594 Out of range index=" + (String)xs1);
   xs2 = vs2.get_extra();
-  Serial.print("\nLine 596 Out of range value=");
+  Serial.print("\nLine 857 Out of range value=");
   Serial.print(xs2);
   Serial.print("\n         Correct result is '' ???");
 
@@ -832,7 +870,8 @@ void testWriteAccess(bool ve) {
 // test size(): int sz = v.size() // see existing test cases
 // test capacity(): int cap = v.capacity()
 void testCapacity(bool ve) {
-  Serial.print("\n\nline 606 Testing capacity()");
+  // ToDo: test userType
+  Serial.print("\n\nline 868 Testing capacity()");
   vector<char> vc2{'d', 'e', 'f'};
   vector<char> vc1{'a', 'b', 'x', 'y', 'z'};
   if (ve) {
@@ -853,6 +892,7 @@ void testCapacity(bool ve) {
 
 // test add new element: push_back (elem)
 void testPushBackChar(bool ve) {
+  
   Serial.print("\n\nline 627 Testing push_back with char");
   vector<char> vc1;
   if (ve) {
@@ -887,8 +927,9 @@ void testPushBackChar(bool ve) {
   }
 } // end of void testPushBackChar()
 
+// ToDo: test userType push_back
 void testPushBackString(bool ve) {
-  Serial.print("\n line 662 Testing push_back with String");
+  Serial.print("\n\n line 925 Testing push_back with String");
   vector<String> vs1;
   if (ve) {
     Serial.print("\n0 string   vs1.size()="); Serial.print(vs1.size());
@@ -953,8 +994,74 @@ void testPushBackString(bool ve) {
 // test change size: reserve (newsize) - see test of push_back()
 
 // test change size: resize (newsize)
+
+void testResizeUserType(bool ve) {
+  Serial.print("\n\nline 999 Testing resize userType");
+  vector<userType> vut1;
+  if (ve) {
+    Serial.print("\n0 userType vut1.size()="); Serial.print(vut1.size());
+    Serial.print(" vut1.capacity()="); Serial.print(vut1.capacity());
+  }
+  vut1.push_back('a');
+  if (ve) {
+    Serial.print("\n1 userType vut1.size()="); Serial.print(vut1.size());
+    Serial.print(" vut1.capacity()="); Serial.print(vut1.capacity());
+    for (int i = 0; i < vut1.size(); i++)
+      Serial.print("\n vut1[" + String(i) + "]=" + (vut1[i].out()));
+  }
+  vut1.push_back('b');
+  if (ve) {
+    Serial.print("\n2 userType vut1.size()="); Serial.print(vut1.size());
+    Serial.print(" vut1.capacity()="); Serial.print(vut1.capacity());
+    for (int i = 0; i < vut1.size(); i++)
+      Serial.print("\n vut1[" + String(i) + "]=" + (vut1[i].out()));
+  }
+  if (ve) Serial.print("\n vut1.clear()");
+  vut1.clear();
+  if (ve) {
+    Serial.print("\n3 userType vut1.size()="); Serial.print(vut1.size());
+    Serial.print(" vut1.capacity()="); Serial.print(vut1.capacity());
+    for (int i = 0; i < vut1.size(); i++)
+      Serial.print("\n vut1[" + String(i) + "]=" + (vut1[i].out()));
+  }
+  if (ve) Serial.print("\n vut1.resize(3)");
+  vut1.resize(3);
+  if (ve) {
+    Serial.print("\n4 userType vut1.size()="); Serial.print(vut1.size());
+    Serial.print(" vut1.capacity()="); Serial.print(vut1.capacity());
+    for (int i = 0; i < vut1.size(); i++)
+      Serial.print("\n vut1[" + String(i) + "]=" + (vut1[i].out()));
+  }
+  if (ve) Serial.print("\n vut1.push_back('c')");
+  vut1.push_back('c');
+  if (ve) {
+    Serial.print("\n5 userType vc1.size()="); Serial.print(vut1.size());
+    Serial.print(" vut1.capacity()="); Serial.print(vut1.capacity());
+    for (int i = 0; i < vut1.size(); i++)
+      Serial.print("\n vut1[" + String(i) + "]=" + (vut1[i].out()));
+  }
+  if (ve) Serial.print("\n vut1.resize(1)");
+  vut1.resize(1);
+  if (ve) {
+    Serial.print("\n6 userType vc1.size()="); Serial.print(vut1.size());
+    Serial.print(" vut1.capacity()="); Serial.print(vut1.capacity());
+    for (int i = 0; i < vut1.size(); i++)
+      Serial.print("\n vut1[" + String(i) + "]=" + (vut1[i].out()));
+  }
+  if (ve) Serial.print("\n vut1.push_back('d')");
+  vut1.push_back('d');
+  if (ve) {
+    Serial.print("\n7 userType vut1.size()="); Serial.print(vut1.size());
+    Serial.print(" vut1.capacity()="); Serial.print(vut1.capacity());
+    for (int i = 0; i < vut1.size(); i++)
+      Serial.print("\n vut1[" + String(i) + "]=" + (vut1[i].out()));
+    Serial.println();
+  }
+} // end of void testResizeUserType()
+
+
 void testResizeChar(bool ve) {
-  Serial.print("\n\nline 724 Testing resize char");
+  Serial.print("\n\nline 993 Testing resize char");
   vector<char> vc1;
   if (ve) {
     Serial.print("\n0 char vc1.size()="); Serial.print(vc1.size());
@@ -1002,7 +1109,7 @@ void testResizeChar(bool ve) {
 } // end of void testResizeChar()
 
 void testResizeInt(bool ve) {
-  Serial.print("\n\nline 762 Testing resize int");
+  Serial.print("\n\nline 1041 Testing resize int");
   vector<int> vi1;
   if (ve) {
     Serial.print("\n0 int  vi1.size()="); Serial.print(vi1.size());
@@ -1050,7 +1157,7 @@ void testResizeInt(bool ve) {
 } // end of void testResizeInt()
 
 void testResizeString(bool ve) {
-  Serial.print("\n line 804 Testing resize String");
+  Serial.print("\n line 1088 Testing resize String");
   vector<String> vs1; // (2);
   // vector<String> vs1{"Initial string", "Initial string2"}; // (2);
   // vector<String> vs1(2); // {"Happy","go"};
@@ -1113,7 +1220,9 @@ void testResizeString(bool ve) {
 
 // test large vectors
 void testLargeVectors(bool ve) {
-  Serial.print("\n line 887 testing LargeVectors char");
+  // ToDo: test userType
+  Serial.print("\n line 1153 testing LargeVectors");
+  Serial.print("\n line 1154 testing LargeVectors char");
   int large = 900; // 600 crash at 2000?
   vector<char>vc1;
   for (int i = 0; i < large; i++) {
@@ -1128,7 +1237,7 @@ void testLargeVectors(bool ve) {
   //   if((i+1)%8==0) Serial.println();
   // }
 
-  Serial.print("\n line 902 testing LargeVectors int");
+  Serial.print("\n line 1169 testing LargeVectors int");
   vector<int>vi1;
   for (int i = 0; i < large; i++) {
     vi1.push_back(i);
@@ -1142,7 +1251,7 @@ void testLargeVectors(bool ve) {
   //   if((i+1)%7==0) Serial.println();
   // }
 
-  Serial.print("\n line 916 testing LargeVectors String");
+  Serial.print("\n line 1183 testing LargeVectors String");
   vector<String>vs1;
   for (int i = 0; i < large; i++) {
     vs1.push_back(String(i));
@@ -1161,7 +1270,8 @@ void testLargeVectors(bool ve) {
 // test memory leak
 void  testMemoryLeak(bool ve) {
   int large = 1200; // max 1400
-  Serial.print("\n line 935 testing for memory leak with a String vector");
+  // ToDo: test userType
+  Serial.print("\n line 1203 testing for memory leak with a String vector");
   // vector<String>vs1(10);         // create 100 size empty vector
   // vector<String>vs1(large);       // create full size empty vector
   vector<String>vs1;              // create zero-length vector
@@ -1179,54 +1289,57 @@ void  testMemoryLeak(bool ve) {
 } // end of void testMemoryLeak(bool ve)
 
 void checkVectorSize(bool ve) {
+  // ToDo: add userType
   vector<bool> vb;
   bool bx2 = vb.get_extra();
-  if (ve) Serial.print("\nline 955 bool  bx2=" + (String)bx2);
+  if (ve) Serial.print("\nline 1224 bool  bx2=" + (String)bx2);
   vector<char> vc;
   char cx2 = vc.get_extra();
-  if (ve) Serial.print("\nline 958 char cx2=" + (String)cx2);
+  if (ve) Serial.print("\nline 1227 char cx2=" + (String)cx2);
   vector<int> vi;
   int ix2 = vi.get_extra();
-  if (ve) Serial.print("\nline 961 int ix2=" + (String)ix2);
+  if (ve) Serial.print("\nline 1230 int ix2=" + (String)ix2);
   vector<double> vd;
   double dx2 = vd.get_extra();
-  if (ve) Serial.print("\nline 964 double dx2=" + (String)dx2);
+  if (ve) Serial.print("\nline 1233 double dx2=" + (String)dx2);
   vector<String> vs{"Happy"};
   String sx2 = vs.get_extra();
-  if (ve) Serial.print("\nline 967 string sx2=" + sx2);
+  if (ve) Serial.print("\nline 1236 string sx2=" + sx2);
 
   Serial.print("\nSize of vector<bool>   is " + (String)sizeof(vector<bool>) + ' ' + (String)sizeof(vb));
   Serial.print("\nSize of vector<char>   is " + (String)sizeof(vector<char>) + ' ' + (String)sizeof(vc));
   Serial.print("\nSize of vector<int>    is " + (String)sizeof(vector<int>) + ' ' + (String)sizeof(vi));
   Serial.print("\nSize of vector<double> is " + (String)sizeof(vector<double>) + ' ' + (String)sizeof(vd));
   Serial.print("\nSize of vector<String> is " + (String)sizeof(vector<String>) + ' ' + (String)sizeof(vs));
+  
 } // end of void checkVectorSize()
 
 void setup() {
   Serial.begin(115200);
   Serial.print("\nStarting testing_vector.ino");
+  // testZeroLength(1);          // line 45
+  // testNonZeroLength(1);        // line 96
+  // testInitializerListVector(1); // line 147
+  testResizeUserType(1);
+  // testResizeString(1); // line 625
+  // testResizeInt(1);      // line 589
+  // testResizeChar(1);     // line 553
   testClear(1);
-  testuserType(1);
+  // testuserType(1);
 /*
   testAlgorithms();
   testIterator();
   checkVectorSize(1);
   testLargeVectors(1); // line 672
   testMemoryLeak(1);   // line 714
-  testResizeString(0); // line 625
   testPushBackString(0); // line 445
-  testResizeInt(0);      // line 589
-  testResizeChar(0);     // line 553
   testPushBackChar(0);   // line 480
   testCapacity(0);       // line 463
   testWriteAccess(0);    // line 380
   testMoveConstructor(0); // line 282
   testCopyAssignment(0);  // line 310
   testCopyConstructor(0); // line 198
-  testInitializerListVector(0); // line 147
 */
-  testNonZeroLength(1);        // line 96
-  testZeroLength(1);          // line 45
   Serial.print("\nEnd of setup test series");
   Serial.println("\nEnd of setup");
 } // end of setup()

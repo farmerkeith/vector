@@ -3,12 +3,12 @@
 // with access checking compatible with the Arduino environment
 // which does not support the try-throw-catch model used by std::vector
 // This software has been tested with a WeMos D1 mini pro (ESP8266 processor)
+// last update 11 September 2019
 
 # ifndef FARMERKEITH_VECTOR_H
 # define FARMERKEITH_VECTOR_H
 
 // These are needed in the definition of class vector
-
 using std::initializer_list;
 using std::copy;
 using std::allocator;
@@ -23,7 +23,7 @@ using std::allocator;
 
 // As for std::vector, unchecked access is provided with the operator [], and checked
 // access is provided with the function at().
-// Vector access outside the defined range from 0 to size-1 using at() results in the
+// In this version, vector access outside the defined range from 0 to size-1 using at() results in the
 // return of a default T object. In the case of a read access, the returned object is
 // typically 0 or the empty string. In the case of a write access, the object for
 // writing is written into the memory reserved for that purpose (an object named "extra").
@@ -48,19 +48,19 @@ class vector { // vector of Ts
     // or write the values directly, eg "v.debug.ZeroLength = 1;"
     // where v is the name of your vector.
     struct debugBits { //                                     2 bytes
-      unsigned ZeroLength       : 1 ; // 12
-      unsigned NonZeroLength    : 1 ; // 11
-      unsigned InitializerList  : 1 ; // 10
-      unsigned CopyConstructor  : 1 ; // 9
-      unsigned MoveConstructor  : 1 ; // 8
-      unsigned CopyAssignment   : 1 ; // 7
-      unsigned MoveAssignment   : 1 ; // 6
-      unsigned Access           : 1 ; // 5
-      unsigned OutOfRangeAccess : 1 ; // 4
-      unsigned Delete           : 1 ; // 3
-      unsigned Resize           : 1 ; // 2
-      unsigned Reserve          : 1 ; // 1
-      unsigned PushBack         : 1 ; // 0
+      unsigned ZeroLength       : 1 ; // 13
+      unsigned NonZeroLength    : 1 ; // 12
+      unsigned InitializerList  : 1 ; // 11
+      unsigned CopyConstructor  : 1 ; // 10
+      unsigned MoveConstructor  : 1 ; // 9
+      unsigned CopyAssignment   : 1 ; // 8
+      unsigned MoveAssignment   : 1 ; // 7
+      unsigned Access           : 1 ; // 6
+      unsigned OutOfRangeAccess : 1 ; // 5
+      unsigned Delete           : 1 ; // 4
+      unsigned Resize           : 1 ; // 3
+      unsigned Reserve          : 1 ; // 2
+      unsigned PushBack         : 1 ; // 1
       unsigned Clear            : 1 ; // 0
     } debug;     // was 13 bool -> 13 bytes
 
@@ -75,24 +75,24 @@ class vector { // vector of Ts
 
     vector(initializer_list<T>lst);    // initializer_list constructor
 
-    vector (const vector& arg); // copy constructor, see p633
+    vector (const vector& arg);        // copy constructor, see p633
 
     vector& operator=(const vector& arg); // copy assignment, see p635
 
-    vector(vector&& arg); // move constructor, see p639
+    vector(vector&& arg);             // move constructor, see p639
 
-    vector& operator=(vector&& arg); // move assignment, see p639
+    vector& operator=(vector&& arg);  // move assignment, see p639
 
     ~vector(); // destructor
 
     T& operator[](int n) {   // unchecked access for read/write
       if (debug.Access) Serial.print("\n(debug) unchecked access for vector");
-      if (sz == 0) return extra; else return elem[n]; // access, return reference, see page 646
+      if (sz == 0 && space == 0) return extra; else return elem[n]; // access, return reference, see page 646
     }
 
     const T& operator[](int n) const { // unchecked access for read/write to a const vector
       if (debug.Access) Serial.print("\n(debug) Unchecked access for const vector");
-      if (sz == 0) return T{}; else return elem[n]; // Write access, return reference, see 648
+      if (sz == 0 && space == 0) return T{}; else return elem[n]; // Write access, return reference, see 648
     }
 
     const T& at(int n, bool& out_of_range) const; // checked access for read/write
@@ -110,7 +110,7 @@ class vector { // vector of Ts
     }
 
     size_type size() const {
-      return sz;  // get size
+      return sz;     // get size
     }
 
     int capacity() const {
@@ -123,15 +123,15 @@ class vector { // vector of Ts
 
     // this function (get_extra()) returns the value stored in extra
     // and also clears it back to default (eg 0 for numbers, empty for String)
-    T get_extra() { // get value stored in extra[0]
-      T t1 = extra; // make local copy of extra
+    T get_extra() {  // get value stored in extra[0]
+      T t1 = extra;  // make local copy of extra
       extra = T{};   // reset stored value to default/null
       return t1;
     }
 
     void resize(uint16_t newsize, T); // growth see p692. Definition below.
 
-    void push_back (const T& d); // see p692. Definition below.
+    void push_back (const T& d);      // see p692. Definition below.
 
     void reserve (uint16_t newalloc); // see p692. Definition below.
 
@@ -154,15 +154,14 @@ class vector { // vector of Ts
     iterator insert (iterator p, const T& val); // inserts val at vector position p
     iterator erase (iterator p); // removes the vector element at position p
 
-    // clear function - resets size to 0 and de-allocates the memory reserved for elements
-    void clear(); 
+    // clear function - resets size to 0 and writes a default value into the memory reserved for elements
+    void clear();
 
   private:
     uint16_t calcSpace() {
-      return max(space + 4, (int)((float)space * 1.1)); // "magic constants 4 & 1.1"
+      return max(space + 4, (int)((float)space * 1.1)); // "magic constants" 4 & 1.1
+      // note that std::vector uses 8 and 2 so uses up more space usually
     }
-
-
 }; // end of class vector
 
 template<typename T, typename A>
@@ -174,11 +173,13 @@ vector<T, A>::vector() : elem(0) // constructor for zero length vector
 
 template<typename T, typename A>
 vector<T, A>::vector(int s) // "normal" constructor (s is the element count) p643
-  : sz{s}, space{s},   // initialize sz and space
-    elem{new T[s]}     // allocate memory for sz Ts, not initialized
+  : sz{s}, space{s}   // initialize sz and space
+  , extra{T{}}        // initialise extra to default value
 {
   setDebugBits();
-  for (int i = 0; i < sz; ++i) elem[i] = T{}; // initialize every element to T{} (p327)
+  T* p = alloc.allocate(sz); // get a new memory allocation for elem
+  for (int i = 0; i < sz; ++i) alloc.construct(&p[i], T{}); // initialize to T{}
+  elem = p;                       // point elem to new memory location
   if (debug.NonZeroLength)
     Serial.print("\n(debug) constructor for vector with capacity " +
                  String(s) + " elements");
@@ -186,36 +187,43 @@ vector<T, A>::vector(int s) // "normal" constructor (s is the element count) p64
 
 template<typename T, typename A>
 vector<T, A>::vector(initializer_list<T>lst)    // initializer_list constructor
-  : sz{lst.size()}, space{lst.size()}, // initialize sz and space
-    extra{T{}},    // initialise extra to default value
-    elem{new T[sz]}         // allocate memory for sz Ts, not initialized
+  : sz{lst.size()}, space{lst.size()} // initialize sz and space
+  , extra{T{}}    // initialise extra to default value
 {
   setDebugBits();
-  copy(lst.begin(), lst.end(), elem); // initialize using std::copy
+  T* p = alloc.allocate(sz); // get a new memory allocation for elem
+  for (int i = 0; i < sz; ++i) alloc.construct(&p[i], T{}); // initialize to T{}
+  elem = p;                       // point elem to new memory location
+  copy(lst.begin(), lst.end(), elem); // copy list elements using std::copy
   if (debug.InitializerList)
     Serial.print("\n(debug) constructor for InitializerList vector");
 } // end of vector(initializer_list<T>lst)
 
 template<typename T, typename A>
 vector<T, A>::vector (const vector& arg) // copy constructor, see p633
-  : sz{arg.sz}, space{arg.space},
-    elem{new T[arg.sz]} // create data members
+  : sz{arg.sz}, space{arg.space} 
+  , extra{T{}}    // initialise extra to default value
 {
   setDebugBits();
-  for (int i = 0; i < arg.sz; i++) *(elem + i) = arg.elem[i]; // copy members from arg
+  T* p = alloc.allocate(arg.sz); // get a new memory allocation for elem
+  for (int i = 0; i < arg.sz; ++i) alloc.construct(&p[i], arg.elem[i]); // copy members from arg
+  elem = p;                       // point elem to new memory location
+  // for (int i = 0; i < arg.sz; i++) *(elem + i) = arg.elem[i]; // copy members from arg
   if (debug.CopyConstructor) Serial.print("\n(debug) Copy Constructor for vector");
 } // end of vector (const vector& arg)
 
-template<typename T, typename A>
+template<typename T, typename A> 
 vector<T, A>& vector<T, A>::operator=(const vector& arg) // copy assignment, see p635
 {
   setDebugBits();
-  T* p = new T[arg.sz]; // pointer to new space for copy of elements
-  for (int i = 0; i < arg.sz; i++) { // my version of copying
-    *(p + i) = arg.elem[i];
-  }
-  delete[] elem;  // deallocate old space
-  elem = p;       // reset elem to point to the new copy
+  T* p = alloc.allocate(arg.space); // get a new memory allocation the size of copy origin
+  // T* p = new T[arg.sz]; // pointer to new space for copy of elements
+  for (int i = 0; i < arg.sz; ++i) alloc.construct(&p[i], arg.elem[i]); // copy existing elem into new
+  for (int i = arg.sz; i < arg.space; ++i) alloc.construct(&p[i], T{}); // set empty new space to default
+  for (int i = 0; i < sz; ++i) alloc.destroy (&elem[i]);    // destoy old elem 0 to sz
+  alloc.deallocate(elem, space);  // deallocate old elem space (start at elem, count is space)
+  // delete[] elem;               // deallocate old space
+  elem = p;                       // reset elem to point to the new copy
   sz = arg.sz;
   space = arg.space;
   if (debug.CopyAssignment) Serial.print("\n(debug) Copy Assignment for vector");
@@ -225,19 +233,19 @@ vector<T, A>& vector<T, A>::operator=(const vector& arg) // copy assignment, see
 template<typename T, typename A>
 vector<T, A>::vector(vector&& arg) // move constructor, see p639
   : sz{arg.sz}, space{arg.space}
-  , extra{arg.extra}
-  , elem{arg.elem}   // copy
+  , extra{arg.extra} // initialize the target vector with the original values
+  , elem{arg.elem}   
 { setDebugBits();
-  arg.sz = 0;     // set original vector to empty/null
+  arg.sz = 0;        // set original vector to empty/null
   arg.space = 0;
   arg.elem = nullptr;
-  arg.extra = T{}; // just added, not tested
+  arg.extra = T{}; 
   if (debug.MoveConstructor) Serial.print("\n(debug) Move Constructor for vector");
 } // end of vector(vector&& arg) // move constructor
 
 template<typename T, typename A>
 vector<T, A>& vector<T, A>::operator=(vector&& arg) // move assignment, see p639
-{ delete[] elem;
+{ delete[] elem; // ?? ToDo: check this
   elem = arg.elem;
   extra = arg.extra;
   sz = arg.sz;
@@ -245,7 +253,7 @@ vector<T, A>& vector<T, A>::operator=(vector&& arg) // move assignment, see p639
   setDebugBits();
   arg.elem = nullptr;
   arg.extra = T{};
-  arg.sz = 0;     // set original vector to empty/null
+  arg.sz = 0;        // set original vector to empty/null
   arg.space = 0;
   if (debug.MoveAssignment) Serial.print("\n(debug) Move assignment for vector");
   return *this;
@@ -253,8 +261,7 @@ vector<T, A>& vector<T, A>::operator=(vector&& arg) // move assignment, see p639
 
 template<typename T, typename A>
 vector<T, A>::~vector() // destructor
-{
-  if (debug.Delete) Serial.print("\n(debug) line 256 Delete vector");
+{ if (debug.Delete) Serial.print("\n(debug) Delete vector");
   for (int i = 0; i < sz; ++i) alloc.destroy(&elem[i]); // from Zac
   alloc.deallocate(elem, space);  // deallocate space
 } // end of ~vector() (destructor)
@@ -262,13 +269,10 @@ vector<T, A>::~vector() // destructor
 // --------------------------------------------------
 template<typename T, typename A>
 void vector<T, A>::clear() // clear function
-{
-  if (debug.Clear) Serial.print("\n(debug) Clear vector");
-  for (int i = 0; i < sz; ++i) alloc.destroy(&elem[i]); 
-  // alloc.deallocate(elem, space);  // deallocate space
+{ if (debug.Clear) Serial.print("\n(debug) Clear vector");
+  for (int i = 0; i < sz; ++i) elem[i] = T{};
   sz = 0;
-  // space = 0;
-  extra=T{};
+  extra = T{};
 } // end of vector<T, A>::clear()
 
 template<typename T, typename A>
@@ -280,9 +284,9 @@ const T& vector<T, A>::at(int n, bool& out_of_range) const {  // checked access 
     out_of_range_index = n;
     return extra;
   }
-  else { // n is in range
+  else {                  // n is in range
     out_of_range = 0;
-    return elem[n];  // acess, return reference, see 648
+    if (sz == 0 && space == 0) return T{}; else return elem[n]; // acess, return reference, see 648
   }
 } // end of const T& at(int n, bool& out_of_range) const
 
@@ -295,26 +299,23 @@ T& vector<T, A>::at(int n, bool& out_of_range) {  // checked access for read/wri
     out_of_range_index = n;
     return extra;
   }
-  else { // n is in range
+  else {                 // n is in range
     out_of_range = 0;
-    return elem[n];  // access, return reference, see 648
+    if (sz == 0 && space == 0) return extra; else return elem[n]; // access, return reference, see 648
   }
 } // end of T& at(int n, bool& out_of_range)
 
 template<typename T, typename A>
 void vector<T, A>::reserve(uint16_t newalloc) { // page 692
-  if (debug.Reserve && sz > 500) {
-    Serial.print("\n(debug) line 251 Reserve for vector, ");
-    if (newalloc <= space) Serial.print("nothing to do");
-    else {
-      Serial.print(" new space " + String(newalloc) + ", copy and destroy old " + String(space));
-    }
+  if (debug.Reserve) {
+    Serial.print("\n(debug) Reserve for vector, new space ");
+    Serial.print(String(newalloc) + ", copy and destroy old " + String(space));
   }
-  if (newalloc <= space) return;  // nothing to do if space does not increase
-  T* p = alloc.allocate(newalloc); // get a new memory allocation for elem
+  T* p = alloc.allocate(newalloc); // get a new memory allocation for elem the size of newalloc
   for (int i = 0; i < sz; ++i) alloc.construct(&p[i], elem[i]); // copy existing elem into new
-  for (int i = 0; i < sz; ++i) alloc.destroy (&elem[i]);    // destoy old elem
-  alloc.deallocate(elem, space);  // deallocate old elem space
+  for (int i = sz; i < newalloc; ++i) alloc.construct(&p[i], T{}); // set empty new space to default
+  for (int i = 0; i < sz; ++i) alloc.destroy (&elem[i]);    // destoy old elem 0 to sz
+  alloc.deallocate(elem, space);  // deallocate old elem space (start at elem, count is space)
   elem = p;                       // point elem to new memory location
   space = newalloc;               // update space info
 } // end of void vector<T, A>::reserve
@@ -322,8 +323,8 @@ void vector<T, A>::reserve(uint16_t newalloc) { // page 692
 template<typename T, typename A>
 void vector<T, A>::push_back(const T& val) { // page 692
   if (debug.PushBack) {
-    if (sz % 100 == 0) {
-      Serial.print("\n(debug) push_back line 326 sz=");
+    if (sz<20 || sz % 100 == 0) { // reduce prints for large vectors
+      Serial.print("\n(debug) push_back sz=");
       Serial.print(sz);
       Serial.print(" space=");
       Serial.print(space);
@@ -331,14 +332,14 @@ void vector<T, A>::push_back(const T& val) { // page 692
   }
   uint16_t newSpace = calcSpace();
   if (debug.PushBack) {
-    if (sz % 100 == 0) {
+    if (sz<20 || sz % 100 == 0) {
       Serial.print("\n(debug) newSpace=");
       Serial.print(newSpace);
     }
   }
   if (debug.PushBack)
     if (sz == space)
-      Serial.print("\n(debug) push_back line 274 call reserve " + (String)newSpace);
+      Serial.print("\n(debug) push_back call reserve " + (String)newSpace);
   if (space == 0) reserve(4);       //start small
   else if (sz >= space) reserve(newSpace); // get more space
   alloc.construct(&elem[sz], val);     // add val at end
@@ -346,25 +347,28 @@ void vector<T, A>::push_back(const T& val) { // page 692
 } // end of void vector<T, A>::push_back
 
 template<typename T, typename A>
-void vector<T, A>::resize(uint16_t newsize, T val = T()) { // page 692
+void vector<T, A>::resize(uint16_t newspace, T val = T()) { // page 692
+  if (debug.Resize) Serial.print("\n(debug line 384) Resize for vector");
   // Cases are:
-  // newsize > space: reserve newsize, space = newsize
-  // newsize == space: do nothing
-  // sz <= newsize < space: destroy elements from newsize up to space, space=newsize
-  // newsize < sz: do nothing (do not destroy existing data), space = sz
-  reserve(newsize); // add space only if extra is required: OK
-  for (int i = sz; i < newsize; ++i) alloc.construct(&elem[i], val); // construct new elements
-  for (int i = max(newsize, sz); i < space; ++i) alloc.destroy(&elem[i]); // destroy KH change
-  if (newsize < sz) space = sz; else space = newsize; // KH change
-  if (debug.Resize) Serial.print("\n(debug) Resize for vector");
+  // newspace > space: allocate newspace, copy old elements into new allocation
+  // newspace == space: do nothing
+  // sz <= newspace < space: as for newspace > space
+  // newspace < sz: set newspace to sz and do as for newspace > space
+  if (newspace != space) {    // do main action
+    if (newspace <= sz) newspace = sz;
+    if (debug.Resize) Serial.print("\n(debug) calling reserve " + (String)newspace);
+    reserve(newspace); // allocate new space, copy old into new, remove old, set space.
+  }
+
+  if (debug.Resize) Serial.print("\n(debug) End of resize for vector");
 } // end of void vector<T, A>::resize
 
 template<typename T, typename A>  // removes the vector element at position p
 typename vector<T, A>::iterator vector<T, A>::erase (iterator p) {  // page 746
   if (p == end()) return p;
   for (auto pos = p + 1; pos != end(); ++pos)
-    *(pos - 1) = *pos;     // copy element one to the left
-  alloc.destroy(&*(end() - 1)); // destroy surplus copy of last element
+    *(pos - 1) = *pos;           // copy element one to the left
+  alloc.destroy(&*(end() - 1));  // destroy surplus copy of last element
   --sz;
   return p;
 } // end of typename vector<T, A>::iterator vector<T, A>::erase (iterator p)
@@ -373,12 +377,12 @@ template<typename T, typename A> // inserts val at vector position p
 typename vector<T, A>::iterator vector<T, A>::insert (iterator p, const T& val) {  // page 746
   uint16_t index = p - begin(); // p will become invalid if reserve() is used
   if (size() == capacity()) reserve (calcSpace()); // same function used by push_back
-  alloc.construct (elem + sz, *end()); // was back()?? new space needs to be initialized ("constructed")
+  alloc.construct (elem + sz, *end()); // new space needs to be initialized ("constructed")
   ++sz;
   iterator pp = begin() + index; // the place to put val.
   for (auto pos = end() - 1; pos != pp; --pos)
-    *pos = *(pos - 1);  // copy element one to the right
-  *(begin() + index) = val; // store val
+    *pos = *(pos - 1);           // copy element one to the right
+  *(begin() + index) = val;      // store val
   return pp;
 } // end of typename vector<T, A>::iterator vector<T, A>::insert (iterator p, const T& val)
 
